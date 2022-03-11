@@ -1,10 +1,14 @@
 import React from 'react'
+import Annonuncement from '../components/Annonuncement'
 import Navbar from '../components/Navbar'
+import Slider from '../components/Slider'
 
 const Home = () => {
   return (
     <div>
-      <Navbar/>
+      <Annonuncement />
+      <Navbar />
+      <Slider />
     </div>
   )
 }
