@@ -10,17 +10,14 @@ import {
 import { useSelector } from "react-redux";
 
 const App = () => {
-  const user = useSelector((state) => state.user.currentUser);
+  // const user = useSelector((state) => state.user.currentUser);
+  const user = false;
   return (
     <Router>
       <Routes>
-        <Route exact path="/">
-          <Home />
-        </Route>
-        <Route path="/login">{user ? <Navigate to="/" /> : <Login />}</Route>
-        <Route path="/register">
-          {user ? <Navigate to="/" /> : <Register />}
-        </Route>
+        <Route exact path="/" element={<Home />} />
+        <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
+        <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
       </Routes>
     </Router>
   );

@@ -2,7 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingCartOutlined } from '@material-ui/icons';
 import { Badge } from '@material-ui/core';
-import MailIcon from '@material-ui/icons'
+import { Link } from "react-router-dom";
 
 const Container = styled.div`
     height : 60px;
@@ -30,7 +30,7 @@ const Input = styled.input`
     border : none;
 `;
 
-const Logo  = styled.h1`
+const Logo = styled.h1`
     font-weight : bold;
     justify-content : flex-start;
     align-items : center;
@@ -74,16 +74,16 @@ const Navbar = () => {
                     </Language>
                 </Left>
                 <Center>
-                <SearchContainer>
+                    <SearchContainer>
                         <Input />
-                        <Search style={{color:"gray", fontSize:16}}/>
+                        <Search style={{ color: "gray", fontSize: 16 }} />
                     </SearchContainer>
                 </Center>
                 <Right>
-                    <MenuItem>REGISTER</MenuItem>
-                    <MenuItem>SIGN-IN</MenuItem>
+                    <Link to="/register"><MenuItem>Register</MenuItem></Link>
+                    <Link to="/login"><MenuItem>Login</MenuItem></Link>
                     <MenuItem>
-                        <Badge badgeContent = {4} color="primary">
+                        <Badge badgeContent={1} color="primary">
                             <ShoppingCartOutlined />
                         </Badge>
                     </MenuItem>
