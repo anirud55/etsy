@@ -62,6 +62,7 @@ const MenuItem = styled.div`
     font-size : 14px;
     cursor : pointer;
     margin-left : 25px;
+    text-decoration : none;
 `;
 
 const Navbar = () => {
