@@ -12,7 +12,7 @@ const Container = styled.div`
       rgba(255, 255, 255, 0.5),
       rgba(255, 255, 255, 0.5)
     ),
-    url("https://images.pexels.com/photos/6984650/pexels-photo-6984650.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=650&w=940")
+    url("https://images.pexels.com/photos/3056059/pexels-photo-3056059.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260")
       center;
   background-size: cover;
   display: flex;
@@ -87,11 +87,11 @@ const Login = () => {
                     <Title>SIGN IN</Title>
                     <Form>
                         <Input
-                            placeholder="username"
+                            placeholder="Username"
                             onChange={(e) => setUsername(e.target.value)}
                         />
                         <Input
-                            placeholder="password"
+                            placeholder="Password"
                             type="password"
                             onChange={(e) => setPassword(e.target.value)}
                         />
