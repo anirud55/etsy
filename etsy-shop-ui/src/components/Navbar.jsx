@@ -3,6 +3,8 @@ import styled from 'styled-components';
 import { Search, ShoppingCartOutlined } from '@material-ui/icons';
 import { Badge } from '@material-ui/core';
 import { Link } from "react-router-dom";
+import { logout } from "../redux/apiCalls";
+import { useDispatch, useSelector } from "react-redux";
 
 const Container = styled.div`
     height : 60px;
@@ -66,6 +68,12 @@ const MenuItem = styled.div`
 `;
 
 const Navbar = () => {
+    const user = useSelector((state) => state.user.currentUser);
+    const dispatch = useDispatch();
+    const handleClick = (e) => {
+        e.preventDefault();
+        logout(dispatch);
+    };
     return (
         <Container>
             <Wrapper>
@@ -81,8 +89,9 @@ const Navbar = () => {
                     </SearchContainer>
                 </Center>
                 <Right>
-                    <Link to="/register"><MenuItem>Register</MenuItem></Link>
-                    <Link to="/login"><MenuItem>Login</MenuItem></Link>
+                    <Link to="/register" hide={user}><MenuItem>Register</MenuItem></Link>
+                    <Link to="/login" hide={user}><MenuItem>Login</MenuItem></Link>
+                    <MenuItem onClick={handleClick} hide={!user}>Logout</MenuItem>
                     <MenuItem>
                         <Badge badgeContent={1} color="primary">
                             <ShoppingCartOutlined />

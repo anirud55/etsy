@@ -1,8 +1,10 @@
+import { useState } from "react";
 import styled from "styled-components";
+import { register } from "../redux/apiCalls";
 import { mobile } from "../responsive";
-import Navbar from '../components/Navbar'
-import { connect } from 'react-redux';
-import axios from 'axios';
+import { useDispatch, useSelector } from "react-redux";
+import Navbar from "../components/Navbar";
+
 
 const Container = styled.div`
   width: 100vw;
@@ -55,13 +57,23 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-const Register = () => {
+const Error = styled.span`
+  color: red;
+`;
 
-  const onSubmit = (data) => {
-    axios.post("http://localhost:3001/auth", data).then(() => {
-      console.log(data);
-    });
-  };
+const Register = () => {
+  const [fname, setFName] = useState("");
+  const [lname, setLName] = useState("");
+  const [uname, setUName] = useState("");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+  const dispatch = useDispatch();
+  const { isFetching, error } = useSelector((state) => state.user);
+
+  const handleClick = (e) => {
+    e.preventDefault();
+    register(dispatch, { fname, lname, uname, email, password });
+};
 
   return (
     <div>
@@ -70,17 +82,45 @@ const Register = () => {
         <Wrapper>
           <Title>CREATE AN ACCOUNT</Title>
           <Form>
-            <Input placeholder="First Name" autoComplete="off" name="fname" required="true" />
-            <Input placeholder="Last Name" autoComplete="off" name="lname" required="true" />
-            <Input placeholder="Username" autoComplete="off" name="uname" required="true"/>
-            <Input placeholder="Email" autoComplete="off" name="email" type="email" required="true"/>
-            <Input placeholder="Password" autoComplete="off" type="password" name="pass" required="true"/>
-            <Input placeholder="Confirm Password" autoComplete="off" type="password" name="cpass" required="true"/>
+            <Input placeholder="First Name" 
+            autoComplete="off" 
+            name="fname" 
+            onChange={(e) => setFName(e.target.value)}
+            required="true" />
+            <Input placeholder="Last Name" 
+            autoComplete="off" 
+            name="lname" 
+            onChange={(e) => setLName(e.target.value)}
+            required="true" />
+            <Input placeholder="Username" 
+            autoComplete="off" 
+            name="uname" 
+            onChange={(e) => setUName(e.target.value)}
+            required="true"/>
+            <Input placeholder="Email" 
+            autoComplete="off" 
+            name="email" 
+            onChange={(e) => setEmail(e.target.value)}
+            type="email" 
+            required="true"/>
+            <Input placeholder="Password" 
+            autoComplete="off" 
+            type="password" 
+            onChange={(e) => setPassword(e.target.value)}
+            name="pass" 
+            required="true"/>
+            <Input placeholder="Confirm Password" 
+            autoComplete="off" 
+            type="password" 
+            name="cpass" 
+            required="true"/>
             <Agreement>
               By creating an account, I consent to the processing of my personal
               data in accordance with the <b>PRIVACY POLICY</b>
             </Agreement>
-            <Button>CREATE</Button>
+            <Button onClick={handleClick} disabled={isFetching}>
+              CREATE
+              </Button>
           </Form>
         </Wrapper>
       </Container>
