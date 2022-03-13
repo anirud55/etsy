@@ -2,6 +2,7 @@ import styled from "styled-components";
 import { mobile } from "../responsive";
 import Navbar from '../components/Navbar'
 import { connect } from 'react-redux';
+import axios from 'axios';
 
 const Container = styled.div`
   width: 100vw;
@@ -55,29 +56,36 @@ const Button = styled.button`
 `;
 
 const Register = () => {
-    return (
-        <div>
-            <Navbar />
-            <Container>
-                <Wrapper>
-                    <Title>CREATE AN ACCOUNT</Title>
-                    <Form>
-                        <Input placeholder="Name" />
-                        <Input placeholder="Last Name" />
-                        <Input placeholder="Username" />
-                        <Input placeholder="Email" />
-                        <Input placeholder="Password" />
-                        <Input placeholder="Confirm Password" />
-                        <Agreement>
-                            By creating an account, I consent to the processing of my personal
-                            data in accordance with the <b>PRIVACY POLICY</b>
-                        </Agreement>
-                        <Button>CREATE</Button>
-                    </Form>
-                </Wrapper>
-            </Container>
-        </div>
-    );
+
+  const onSubmit = (data) => {
+    axios.post("http://localhost:3001/auth", data).then(() => {
+      console.log(data);
+    });
+  };
+
+  return (
+    <div>
+      <Navbar />
+      <Container>
+        <Wrapper>
+          <Title>CREATE AN ACCOUNT</Title>
+          <Form>
+            <Input placeholder="First Name" autoComplete="off" name="fname" required="true" />
+            <Input placeholder="Last Name" autoComplete="off" name="lname" required="true" />
+            <Input placeholder="Username" autoComplete="off" name="uname" required="true"/>
+            <Input placeholder="Email" autoComplete="off" name="email" type="email" required="true"/>
+            <Input placeholder="Password" autoComplete="off" type="password" name="pass" required="true"/>
+            <Input placeholder="Confirm Password" autoComplete="off" type="password" name="cpass" required="true"/>
+            <Agreement>
+              By creating an account, I consent to the processing of my personal
+              data in accordance with the <b>PRIVACY POLICY</b>
+            </Agreement>
+            <Button>CREATE</Button>
+          </Form>
+        </Wrapper>
+      </Container>
+    </div>
+  );
 };
 
 export default Register;
