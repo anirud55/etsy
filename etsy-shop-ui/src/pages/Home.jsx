@@ -1,5 +1,5 @@
 import React from 'react'
-import Annonuncement from '../components/Annonuncement'
+// import Annonuncement from '../components/Annonuncement'
 import Navbar from '../components/Navbar'
 import Slider from '../components/Slider'
 

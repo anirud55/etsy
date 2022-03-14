@@ -57,9 +57,6 @@ const Button = styled.button`
   cursor: pointer;
 `;
 
-const Error = styled.span`
-  color: red;
-`;
 
 const Register = () => {
   const [fname, setFName] = useState("");
@@ -118,7 +115,7 @@ const Register = () => {
               By creating an account, I consent to the processing of my personal
               data in accordance with the <b>PRIVACY POLICY</b>
             </Agreement>
-            <Button onClick={handleClick} disabled={isFetching}>
+            <Button onClick={handleClick} disabled={isFetching} hide={error}>
               CREATE
               </Button>
           </Form>
