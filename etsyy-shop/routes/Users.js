@@ -32,10 +32,7 @@ router.post('/login', async (req, res) => {
     if (!user) res.status(401).json({ eror: "User doesn't exist" });
     bcrypt.compare(password, user.password).then((match) => {
         if (!match) res.status(401).json({ error: "Wrong Username and password combination" });
-        res.status(200).json({
-            msg:"SUCCESS",
-            user : user.uname,
-    });
+        res.status(200).json(user.uname);
     });
 });
 
