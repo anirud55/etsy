@@ -21,7 +21,7 @@ module.exports = (sequelize, DataTypes) => {
             default: 1,
         },
         amount: {
-            type: DataTypes.NUMBER,
+            type: DataTypes.INTEGER,
             allowNull: false,
         },
         address: {
@@ -29,7 +29,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
         },
         quantity: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
             allowNull: false,
             default: "pending",
         },
