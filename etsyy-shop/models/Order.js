@@ -28,8 +28,8 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.STRING,
             allowNull: false,
         },
-        quantity: {
-            type: DataTypes.INTEGER,
+        status: {
+            type: DataTypes.STRING,
             allowNull: false,
             default: "pending",
         },

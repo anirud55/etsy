@@ -33,7 +33,12 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         price: {
-            type: DataTypes.STRING,
+            type: DataTypes.INTEGER,
+            allowNull: false,
+            required: true
+        },
+        quantity: {
+            type: DataTypes.INTEGER,
             allowNull: false,
             required: true
         },
@@ -42,7 +47,6 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false,
             default: 0,
         },
-
     });
     return Product;
 };
