@@ -79,7 +79,7 @@ const Navbar = () => {
             <Wrapper>
                 <Left>
                     <Language>
-                        <Logo>ETSYY</Logo>
+                        <Link to="/"><Logo>ETSYY</Logo></Link>
                     </Language>
                 </Left>
                 <Center>
