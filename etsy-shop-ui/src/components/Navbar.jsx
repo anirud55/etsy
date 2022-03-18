@@ -2,12 +2,15 @@ import React from 'react';
 import styled from 'styled-components';
 import { Search, ShoppingCartOutlined } from '@material-ui/icons';
 import { Badge } from '@material-ui/core';
-import { Link } from "react-router-dom";
-import { logout } from "../redux/apiCalls";
+import { Link } from 'react-router-dom';
+import { logout } from '../redux/apiCalls';
 import { useDispatch, useSelector } from "react-redux";
 
 const Container = styled.div`
     height : 60px;
+    @media only screen and (max-width:380px){
+        display:none;
+    }
 `;
 
 const Wrapper = styled.div`
