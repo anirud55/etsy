@@ -20,7 +20,7 @@ app.use("/auth", usersRoute);
 app.use("/shop", shopRoute);
 app.use("/product", prodRoute);
 app.use("/cart", cartRoute);
-app.use("/order", cartRoute);
+app.use("/order", orderRoute);
 
 //start your server on port 3001
 db.sequelize.sync().then(() => {
