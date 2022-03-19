@@ -105,13 +105,13 @@ app.post("/login", function (req, res) {
           res.writeHead(400, {
             "Content-Type": "text/plain",
           });
-          res.end("Incorrect Password");
+          res.end("Wrong Username and password combination");
         }
       } else {
         res.writeHead(400, {
           "Content-Type": "text/plain",
         });
-        res.end("Email is not registered with us");
+        res.end("User doesn't exist");
       }
     }
   );
@@ -134,7 +134,7 @@ app.post("/register", function (req, res) {
           res.writeHead(400, {
             "Content-Type": "text/plain",
           });
-          res.end("Email is already registered with us");
+          res.end("User is already registered");
           return;
         }
       }
@@ -210,7 +210,7 @@ app.post("/updateprofile", function (req, res) {
             "Content-Type": "text/plain",
           });
           res.end(
-            "Profile not updated as email is registered with another user."
+            "Profile can not be updated as email address is in use"
           );
           return;
         }
@@ -218,9 +218,154 @@ app.post("/updateprofile", function (req, res) {
       res.writeHead(200, {
         "Content-Type": "text/plain",
       });
-      res.end("Profile updated");
+      res.end("Profile updated successfully");
     }
   );
+});
+
+app.get("/search", function (req, res) {
+  if (req.query.email === "") {
+    con.query(
+      "Select * from products where name like '%" +
+        req.query.name +
+        "%' or category like '%" +
+        req.query.name +
+        "%'",
+      function (err, result) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        res.writeHead(200, {
+          "Content-Type": "application/json",
+        });
+        res.end(JSON.stringify(result));
+      }
+    );
+  } else {
+    con.query(
+      "Select * from users where email='" + req.query.email + "'",
+      function (err, result) {
+        if (err) {
+          console.log(err);
+          return;
+        }
+        console.log(result[0].shopname);
+        con.query(
+          "Select * from (select * from products where shopname!='" +
+            result[0].shopname +
+            "') as filteredproducts where name like '%" +
+            req.query.name +
+            "%' or category like '%" +
+            req.query.name +
+            "%'",
+          function (err, result) {
+            if (err) {
+              console.log(err);
+              return;
+            }
+            res.writeHead(200, {
+              "Content-Type": "application/json",
+            });
+            res.end(JSON.stringify(result));
+          }
+        );
+      }
+    );
+  }
+});
+
+app.post("/addproduct", function (req, res) {
+  con.query(
+    "Insert into products (name,price,description,category,instock,image,shopname) values ('" +
+      req.body.name +
+      "','" +
+      req.body.price +
+      "','" +
+      req.body.description +
+      "','" +
+      req.body.category +
+      "','" +
+      req.body.instock +
+      "','" +
+      req.body.image +
+      "','" +
+      req.body.shopname +
+      "')",
+    function (err, result) {
+      if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Product exists with same name");
+        }
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "text/plain",
+      });
+      res.end("Added the product successfully");
+    }
+  );
+});
+
+app.post("/updateproduct", function (req, res) {
+  con.query(
+    "Update products set price='" +
+      req.body.price +
+      "',description='" +
+      req.body.description +
+      "',category='" +
+      req.body.category +
+      "',instock='" +
+      req.body.instock +
+      "',image='" +
+      req.body.image +
+      "' where name='" +
+      req.body.name +
+      "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "text/plain",
+      });
+      res.end("Updated product information successfully");
+    }
+  );
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/api/products", function (req, res) {
+  con.query("Select * from products", function (err, result) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify(result));
+  });
+});
+
+app.get("/api/products/id/:id", function (req, res) {
+  const id = req.params.id;
+  con.query("Select * from products", function (err, result) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    const product = result.find((x) => x.id === parseInt(id));
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify(product));
+  });
 });
 
 app.post("/checkavailability", function (req, res) {
@@ -238,12 +383,12 @@ app.post("/checkavailability", function (req, res) {
         res.writeHead(200, {
           "Content-Type": "text/plain",
         });
-        res.end("Shop name is available.");
+        res.end("Shop is available.");
       } else {
         res.writeHead(400, {
           "Content-Type": "text/plain",
         });
-        res.end("Shop name is not available.");
+        res.end("Shop is not available.");
       }
     }
   );
@@ -261,7 +406,7 @@ app.post("/shopcreated", function (req, res) {
         res.writeHead(400, {
           "Content-Type": "text/plain",
         });
-        res.end("Shop was not created");
+        res.end("Shop could not be created");
       } else {
         res.writeHead(200, {
           "Content-Type": "text/plain",
@@ -301,102 +446,9 @@ app.post("/createshop", function (req, res) {
       res.writeHead(200, {
         "Content-Type": "text/plain",
       });
-      res.end("Shop Created");
+      res.end("Shop was created successfully");
     }
   );
-});
-
-app.post("/addproduct", function (req, res) {
-  con.query(
-    "Insert into products (name,price,description,category,instock,image,shopname) values ('" +
-      req.body.name +
-      "','" +
-      req.body.price +
-      "','" +
-      req.body.description +
-      "','" +
-      req.body.category +
-      "','" +
-      req.body.instock +
-      "','" +
-      req.body.image +
-      "','" +
-      req.body.shopname +
-      "')",
-    function (err, result) {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          res.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          res.end("Product with same name exists");
-        }
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Product Added");
-    }
-  );
-});
-
-app.post("/updateproduct", function (req, res) {
-  con.query(
-    "Update products set price='" +
-      req.body.price +
-      "',description='" +
-      req.body.description +
-      "',category='" +
-      req.body.category +
-      "',instock='" +
-      req.body.instock +
-      "',image='" +
-      req.body.image +
-      "' where name='" +
-      req.body.name +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Product Updated");
-    }
-  );
-});
-
-//Route to get All Products when user visits the Home Page
-app.get("/api/products", function (req, res) {
-  con.query("Select * from products", function (err, result) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify(result));
-  });
-});
-
-app.get("/api/products/id/:id", function (req, res) {
-  const id = req.params.id;
-  con.query("Select * from products", function (err, result) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    const product = result.find((x) => x.id === parseInt(id));
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify(product));
-  });
 });
 
 app.get("/ownerdetails/:shopname", function (req, res) {
@@ -444,7 +496,7 @@ app.post("/addshopimage", function (req, res) {
       res.writeHead(200, {
         "Content-Type": "text/plain",
       });
-      res.end("Shop Image added");
+      res.end("Added the shop image successfully");
     }
   );
 });
@@ -525,7 +577,7 @@ app.post("/createorder", function (req, res) {
           res.writeHead(200, {
             "Content-Type": "text/plain",
           });
-          res.end("Order Creted");
+          res.end("Created the order successfully");
         }
       );
     }
@@ -549,58 +601,6 @@ app.get("/orders/:email", function (req, res) {
       res.end(JSON.stringify(result));
     }
   );
-});
-
-app.get("/search", function (req, res) {
-  if (req.query.email === "") {
-    con.query(
-      "Select * from products where name like '%" +
-        req.query.name +
-        "%' or category like '%" +
-        req.query.name +
-        "%'",
-      function (err, result) {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        res.writeHead(200, {
-          "Content-Type": "application/json",
-        });
-        res.end(JSON.stringify(result));
-      }
-    );
-  } else {
-    con.query(
-      "Select * from users where email='" + req.query.email + "'",
-      function (err, result) {
-        if (err) {
-          console.log(err);
-          return;
-        }
-        console.log(result[0].shopname);
-        con.query(
-          "Select * from (select * from products where shopname!='" +
-            result[0].shopname +
-            "') as filteredproducts where name like '%" +
-            req.query.name +
-            "%' or category like '%" +
-            req.query.name +
-            "%'",
-          function (err, result) {
-            if (err) {
-              console.log(err);
-              return;
-            }
-            res.writeHead(200, {
-              "Content-Type": "application/json",
-            });
-            res.end(JSON.stringify(result));
-          }
-        );
-      }
-    );
-  }
 });
 
 app.get("/shopsalestotal/:shopname", function (req, res) {
@@ -704,7 +704,7 @@ app.post("/addtofavorites", function (req, res) {
             res.writeHead(200, {
               "Content-Type": "text/plain",
             });
-            res.end("Added to favorites");
+            res.end("Product added to favorites list");
           }
         );
       } else {
@@ -718,7 +718,7 @@ app.post("/addtofavorites", function (req, res) {
             res.writeHead(400, {
               "Content-Type": "text/plain",
             });
-            res.end("Removed from favorites");
+            res.end("Product removed from favorites");
           }
         );
       }
@@ -727,7 +727,7 @@ app.post("/addtofavorites", function (req, res) {
 });
 
 //Route to Get users favorites
-app.get("/getfavoriteproducts/:email", function (req, res) {
+app.get("/getfavorite/:email", function (req, res) {
   con.query(
     "SELECT GROUP_CONCAT(QUOTE(name)) as name FROM favorites where email='" +
       req.params.email +
