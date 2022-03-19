@@ -1,4 +1,4 @@
-# etsydevlopment
-# My New Etsy Development Web project
+# ETSYY
 
-# Full-stack web application using Node.js, react, express, mysql database
+## TECH STACK
+## Node.js, react, express, mysql database
