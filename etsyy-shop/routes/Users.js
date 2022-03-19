@@ -36,9 +36,25 @@ router.post('/login', async (req, res) => {
     });
 });
 
+router.put("/:id", async (req, res) => {
+    try {
+        
+        const updatedUser = await Users.findByIdAndUpdate(
+            req.params.id,
+            {
+                $set: req.body,
+            },
+            { new: true }
+        );
+        res.status(200).json(updatedUser);
+    } catch (err) {
+        res.status(500).json(err);
+    }
+})
+
 router.get('/logout', (req, res) => {
     // req.session.destroy();
-    res.status(200).json({msg:"SUCCESS"});
-  });
+    res.status(200).json({ msg: "SUCCESS" });
+});
 
 module.exports = router;
