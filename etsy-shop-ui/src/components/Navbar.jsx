@@ -1,10 +1,13 @@
 import React from 'react';
 import styled from 'styled-components';
+import cookie from "react-cookies";
 import { Search, ShoppingCartOutlined } from '@material-ui/icons';
 import { Badge } from '@material-ui/core';
 import { Link } from 'react-router-dom';
 import { logout } from '../redux/apiCalls';
 import { useDispatch, useSelector } from "react-redux";
+import axios from 'axios';
+import { setproductaction } from "../actions/productactions";
 
 const Container = styled.div`
     height : 60px;
@@ -73,10 +76,15 @@ const MenuItem = styled.div`
 const Navbar = () => {
     const user = useSelector((state) => state.user.currentUser);
     const dispatch = useDispatch();
-    const handleClick = (e) => {
-        e.preventDefault();
-        logout(dispatch);
-    };
+    //handle logout to destroy the cookie
+  const handleLogout = (e) => {
+    console.log("Inside logout");
+    dispatch(logout());
+    axios.get("http://localhost:3001/products").then((response) => {
+      dispatch(setproductaction(response.data));
+    });
+    cookie.remove("cookie", { path: "/" });
+  };
     return (
         <Container>
             <Wrapper>
@@ -94,7 +102,7 @@ const Navbar = () => {
                 <Right>
                     <Link to="/register" hide={user}><MenuItem>Register</MenuItem></Link>
                     <Link to="/login" hide={user}><MenuItem>Login</MenuItem></Link>
-                    <MenuItem onClick={handleClick} hide={!user}>Logout</MenuItem>
+                    <Link to="/"><MenuItem onClick={handleLogout} hide={!user}>Logout</MenuItem></Link>
                     <MenuItem>
                         <Badge badgeContent={1} color="primary">
                             <ShoppingCartOutlined />
