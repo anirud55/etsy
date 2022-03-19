@@ -4,33 +4,25 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.INTEGER,
             autoIncrement: true,
             primaryKey: true,
-            allowNull: false
         },
         userid: {
             type: DataTypes.INTEGER,
-            allowNull: false,
             required : true
         },
         productid: {
             type: DataTypes.INTEGER,
-            allowNull: false,
         },
         quantity: {
             type: DataTypes.INTEGER,
-            allowNull: false,
-            default: 1,
         },
         amount: {
             type: DataTypes.INTEGER,
-            allowNull: false,
         },
         address: {
             type: DataTypes.STRING,
-            allowNull: false,
         },
         status: {
             type: DataTypes.STRING,
-            allowNull: false,
             default: "pending",
         },
     });

@@ -15,7 +15,7 @@ router.post("/createshop", async (req, res) => {
         const savedShop = await newShop.save();
         res.status(201).json(savedShop);
     } catch (err) {
-        res.status(500).json(err);
+        res.status(500).json(err.message);
     }
 });
 
@@ -23,8 +23,8 @@ router.post("/createshop", async (req, res) => {
 router.get("/checkavailability", async (req, res) => {
     const { shopname } = req.body;
     const shop = await Shop.findOne({ where: { shopname: shopname } });
-    if (!shop) res.status(200).json({ success: "Shop is available" });
-    if (shop) res.status(200).json({success: "Shop is not available" });
+    if (!shop) res.status(200).json( "Shop is available" );
+    if (shop) res.status(200).json("Shop is not available");
 });
 
 module.exports = router;
