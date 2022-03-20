@@ -1,149 +1,202 @@
-import { Add, Remove } from "@material-ui/icons";
-import styled from "styled-components"
-import Footer from "../components/Footer"
-import Navbar from "../components/Navbar"
+import { useParams } from "react-router-dom";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import Row from "react-bootstrap/Row";
+import Col from "react-bootstrap/Col";
+import Card from "react-bootstrap/Card";
+import ListGroup from "react-bootstrap/ListGroup";
+import Badge from "react-bootstrap/Badge";
+import Button from "react-bootstrap/Button";
+import { Helmet } from "react-helmet-async";
+import { Navigate, useNavigate } from "react-router";
+import { Link } from "react-router-dom";
+import cookie from "react-cookies";
+import Favorites from "../components/Favorites";
+import { useSelector } from "react-redux";
 
-const Container = styled.div`
-  
-`;
+function ProductPage(props) {
+  const { id } = useParams();
+  const [product, setProduct] = useState("");
+  const [addToCartQuantity, setaddToCartQuantity] = useState("");
+  const [mounted, setMounted] = useState(false);
+  const [message, setMessage] = useState("");
+  const navigate = useNavigate();
+  const currency = useSelector((state) => state.currency.currency);
 
-const Wrapper = styled.div`
-  padding : 50px;
-  display:flex;
+  useEffect(() => {
+    console.log(id);
+    axios
+      .get("http://localhost:3001/api/products/id/" + id)
+      .then((response) => {
+        //update the state with the response data
+        setProduct(response.data);
+        setMounted(true);
+      });
+  }, []);
 
-`;
+  //instock change handler to update state variable with the text entered by the user
+  const quantityChangeHandler = (e) => {
+    setaddToCartQuantity(e.target.value);
+    setMessage("");
+  };
 
-const ImgContainer = styled.div`
-  flex:1;
+  const addToCartHandler = async () => {
+    if (!cookie.load("cookie")) {
+      setMessage("You must be logged in to add items to cart.");
+    } else if (product.shopname === localStorage.getItem("shopname")) {
+      setMessage("You cannot add your own item to your cart");
+    } else if (setaddToCartQuantity < 1) {
+      setMessage("Please enter a valid quantity.");
+    } else if (localStorage.getItem("cartItems") != null) {
+      var cartItems = JSON.parse(localStorage.getItem("cartItems"));
+      const existItem = cartItems.find((x) => x.id === product.id);
+      // console.log(existItem.quantity);
+      const quantity = existItem
+        ? parseInt(existItem.quantity) + parseInt(addToCartQuantity)
+        : parseInt(addToCartQuantity);
+      console.log(quantity);
+      if (parseInt(product.instock) < parseInt(quantity)) {
+        setMessage("Quantity of product you entered is not available.");
+        return;
+      }
+      if (existItem === undefined) {
+        cartItems[cartItems.length] = {
+          quantity: quantity,
+          ...product,
+        };
+        localStorage.setItem("cartItems", JSON.stringify(cartItems));
+        setMessage("Product added to cart.");
+        return;
+      }
+      const index = cartItems
+        ? cartItems.findIndex((item) => item.id === product.id)
+        : 0;
+      cartItems[index] = {
+        quantity: quantity,
+        ...product,
+      };
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      setMessage("Product added to cart.");
+    } else if (addToCartQuantity <= product.instock) {
+      var cartItems = [
+        {
+          quantity: addToCartQuantity,
+          ...product,
+        },
+      ];
+      localStorage.setItem("cartItems", JSON.stringify(cartItems));
+      setMessage("Product added to cart.");
+    } else {
+      setMessage("Quantity of product you entered is not available.");
+    }
+  };
 
-`;
+  const checkoutHandler = () => {
+    navigate("/cart");
+  };
 
-const Image = styled.img`
-  width:100%;
-  height: 90vh;
-  object-fit: cover;
-`;
-
-const InfoContainer = styled.div`
-  flex:1;
-  padding :0px 50px;
-`;
-
-const Title = styled.h1`
-  font-weight: 200;
-`;
-
-const Desc = styled.p`
-  margin:20px 0px;
-`;
-
-const Price = styled.span`
-  font-weight:100;
-  font-size:40px;
-`;
-
-const FilterContainer = styled.div`
-  width: 50%;
-  margin: 30px 0px;
-  display:flex;
-  justify-content:space-between;
-`;
-
-const Filter = styled.div`
-  display : flex;
-  align-items:center;
-`;
-
-const FilterTitle = styled.span`
-  font-size:20px;
-  font-weight:200;
-`;
-
-const FilterColor = styled.div`
-  width:15px;
-  height: 15px;
-  border-radius:40%;
-  background-color: ${props=>props.color};
-  margin: 0px 5px;
-  cursor:pointer;
-`;
-
-const AddContainer = styled.div`
-  width:50%;
-  display:flex;
-  align-items:center;
-  justify-content : space-between;
-`;
-const AmountContainer = styled.div`
-  display:flex;
-  align-items:center;
-  font-weight:700;
-`;
-const Amount = styled.span`
-  width : 30px;
-  height : 30px;
-  border-radius : 10px; 
-  border : 1px solid teal;
-  display : flex;
-  align-items:center;
-  justify-content:center;
-  margin: 0px 5px;
-`;
-const Button = styled.button`
-  padding: 15px;
-  border: 2px solid teal;
-  background-color: white;
-  cursor: pointer;
-  font-weight : 500;
-  &:hover{
-    background-color : #f8f4f4;
-  }
-`;
-
-const Product = () => {
   return (
-    <Container>
-      <Navbar />
-      <Wrapper>
-        <ImgContainer>
-          <Image src="https://www.prada.com/content/dam/pradanux_products/1/1BA/1BA350/ZO6F02SB/1BA350_ZO6_F02SB_V_OOO_SLR.png/_jcr_content/renditions/cq5dam.web.hebebed.3000.3000.jpg" />
-        </ImgContainer>
-        <InfoContainer>
-          <Title>Prada Re-Edition 1995 brushed-leather medium handbag</Title>
-          <Desc>This handbag, a re-edition of an iconic Prada bag of 1995, is characterized by its elegant geometric silhouette with distinct, minimalist lines. Formal allure and practicality meet in its design with a central zipper closure and three internal compartments, enhanced by the sophisticated accent of the silver screen-printed lettering logo. The accessory is made of fine brushed leather, an expression of the brand's expertise.
+    <div>
+      <Row>
+        <Col md={8}>
+          <div>
+            <h3>
+              <img
+                className="img-large"
+                src={product.image}
+                alt={product.name}
+              ></img>
+              <Favorites
+                name={product.name}
+                shopname={product.shopname}
+              ></Favorites>
+            </h3>
+          </div>
+        </Col>
+        <Col md={4}>
+          <ListGroup variant="flush">
+            <ListGroup.Item>
+              <Helmet>
+                <title>{product.name}</title>
+              </Helmet>
+              <h3>{product.name}</h3>
+            </ListGroup.Item>
+            <ListGroup.Item>Description: {product.description}</ListGroup.Item>
+            <ListGroup.Item>Category: {product.category}</ListGroup.Item>
+            <ListGroup.Item>Total Sold: {product.totalsales}</ListGroup.Item>
+            <ListGroup.Item>Available: {product.instock}</ListGroup.Item>
+            <Card>
+              <Card.Body>
+                <ListGroup.Item>
+                  <Row>
+                    <Col>Seller:</Col>
+                    <Col>
+                      <Link to={`/shoppage/${product.shopname}`}>
+                        <Card.Title>{product.shopname}</Card.Title>
+                      </Link>
+                    </Col>
+                  </Row>
+                </ListGroup.Item>
+                <ListGroup variant="flush">
+                  <ListGroup.Item>
+                    <Row>
+                      <Col>Price:</Col>
+                      <Col>
+                        {currency} {product.price}
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
+                  <ListGroup.Item>
+                    <Row>
+                      <Col>Status:</Col>
+                      <Col>
+                        {product.instock > 0 ? (
+                          <Badge bg="success">In Stock</Badge>
+                        ) : (
+                          <Badge bg="danger">Out of Stock</Badge>
+                        )}
+                      </Col>
+                    </Row>
+                  </ListGroup.Item>
 
-            Product code: 1BA350_ZO6_F02SB_V_OOO
-            Leather handles
-            Metal hardware
-            Screen-printed lettering logo
-            Nylon logo-print lining with three compartments, including one with zipper
-            Prada Re-Edition 1995 keychain
-            Height: 21cm
-            Length: 8cm
-            Width: 30cm
-          </Desc>
-          <Price>$ 3,050</Price>
-          <FilterContainer>
-            <Filter>
-              <FilterTitle>Color</FilterTitle>
-              <FilterColor color="Red" />
-              <FilterColor color="Black" />
-              <FilterColor color="Blue" />
-            </Filter>
-          </FilterContainer>
-          <AddContainer>
-            <AmountContainer>
-              <Remove />
-              <Amount>1</Amount>
-              <Add />
-              <Button>ADD TO CART</Button>
-            </AmountContainer>
-          </AddContainer>
-        </InfoContainer>
-      </Wrapper>
-      <Footer />
-    </Container>
-  )
+                  {product.instock > 0 && (
+                    <ListGroup.Item>
+                      <div class="form-group" style={{ width: "100%" }}>
+                        <input
+                          onChange={quantityChangeHandler}
+                          type="text"
+                          class="form-control"
+                          name="countInStock"
+                          value={addToCartQuantity}
+                          placeholder="Quantity of product"
+                        />
+                      </div>
+                      <br></br>
+                      <div className="d-grid">
+                        <Button onClick={addToCartHandler} variant="primary">
+                          Add to Cart
+                        </Button>
+                        <br></br>
+                        <Button onClick={checkoutHandler} variant="primary">
+                          Proceed to Checkout
+                        </Button>
+                      </div>
+                      <br></br>
+                      <div>
+                        <div class={message ? "visible" : "invisible"}>
+                          <div class="alert alert-primary">{message}</div>
+                        </div>
+                      </div>
+                    </ListGroup.Item>
+                  )}
+                </ListGroup>
+              </Card.Body>
+            </Card>
+          </ListGroup>
+        </Col>
+      </Row>
+    </div>
+  );
 }
 
-export default Product
+export default ProductPage;

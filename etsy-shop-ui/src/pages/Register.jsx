@@ -3,7 +3,7 @@ import styled from "styled-components";
 import { register } from "../redux/apiCalls";
 import { mobile } from "../responsive";
 import { useDispatch, useSelector } from "react-redux";
-import Navbar from "../components/Navbar";
+import ENavbar from "../components/ENavbar";
 
 
 const Container = styled.div`
@@ -74,7 +74,7 @@ const Register = () => {
 
   return (
     <div>
-      <Navbar />
+      <ENavbar />
       <Container>
         <Wrapper>
           <Title>CREATE AN ACCOUNT</Title>

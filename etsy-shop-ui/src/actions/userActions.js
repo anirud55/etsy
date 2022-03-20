@@ -10,7 +10,7 @@ import {
   USER_SIGNUP_SUCCESS,
   CLEAR_ERROR_MESSAGE,
   UPDATE_USER_INFO,
-} from "../constants/userConstants";
+} from "../constants/Constants";
 
 export const login = (email, password) => async (dispatch) => {
   dispatch({ type: USER_LOGIN_REQUEST, payload: { email, password } });

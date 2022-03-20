@@ -1,7 +1,7 @@
 import { Announcement } from "@material-ui/icons";
 import styled from "styled-components";
 import Footer from "../components/Footer";
-import Navbar from "../components/Navbar";
+import ENavbar from "../components/ENavbar";
 import Products from "../components/Products";
 
 const Container = styled.div`
@@ -41,7 +41,7 @@ const Option = styled.option`
 const ProductList = () => {
   return (
     <Container>
-      <Navbar />
+      <ENavbar />
       <Title>Dresses</Title>
       <FilterContainer>
         <Filter>

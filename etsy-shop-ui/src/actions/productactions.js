@@ -1,7 +1,7 @@
 import {
     SET_PRODUCTS,
     SHOP_PAGE_PRODUCTS_UPDATED,
-  } from "../constants/userConstants";
+  } from "../constants/Constants";
   
   export const setproductaction = (products) => async (dispatch) => {
     dispatch({ type: SET_PRODUCTS, payload: { products } });
