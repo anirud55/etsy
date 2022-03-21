@@ -111,14 +111,14 @@ app.post("/login", function (req, res) {
         res.writeHead(400, {
           "Content-Type": "text/plain",
         });
-        res.end("User doesn't exist");
+        res.end("Email is not registered with us");
       }
     }
   );
 });
 
 //Route to handle Post Request Call
-app.post("/register", function (req, res) {
+app.post("/signup", function (req, res) {
   con.query(
     "INSERT INTO users (name, email, password) VALUES ('" +
       req.body.name +
@@ -134,7 +134,7 @@ app.post("/register", function (req, res) {
           res.writeHead(400, {
             "Content-Type": "text/plain",
           });
-          res.end("User is already registered");
+          res.end("Email is already registered with us");
           return;
         }
       }
@@ -210,7 +210,7 @@ app.post("/updateprofile", function (req, res) {
             "Content-Type": "text/plain",
           });
           res.end(
-            "Profile can not be updated as email address is in use"
+            "Profile not updated as email is registered with another user."
           );
           return;
         }
@@ -218,12 +218,361 @@ app.post("/updateprofile", function (req, res) {
       res.writeHead(200, {
         "Content-Type": "text/plain",
       });
-      res.end("Profile updated successfully");
+      res.end("Profile updated");
+    }
+  );
+});
+
+app.post("/shopNameAvailable", function (req, res) {
+
+  con.query(
+    "Select * from shop where shopname='" + req.body.shopname + "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      // req.session.user = result;
+
+      console.log(result);
+      if (result < 1) {
+        res.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+        res.end("Shop is available");
+      } else {
+        res.writeHead(400, {
+          "Content-Type": "text/plain",
+        });
+        res.end("Shop is not available");
+      }
+    }
+  );
+});
+
+app.post("/isshopalreadycreated", function (req, res) {
+
+  con.query(
+    "Select shopname from users where email='" + req.body.email + "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      // req.session.user = result;
+
+      console.log(result[0].shopname);
+      if (result[0].shopname == null) {
+        res.writeHead(400, {
+          "Content-Type": "text/plain",
+        });
+        res.end("Shop hasn't been created yet");
+      } else {
+        res.writeHead(200, {
+          "Content-Type": "text/plain",
+        });
+        res.end(result[0].shopname);
+      }
+    }
+  );
+});
+
+app.post("/createshop", function (req, res) {
+  
+  con.query(
+    "Insert into shop (shopname,email) values ('" +
+      req.body.shopname +
+      "','" +
+      req.body.email +
+      "')",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+    }
+  );
+  con.query(
+    "Update users SET shopname='" +
+      req.body.shopname +
+      "' where email='" +
+      req.body.email +
+      "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+
+      res.writeHead(200, {
+        "Content-Type": "text/plain",
+      });
+      res.end("Shop Created");
+    }
+  );
+});
+
+app.post("/addproduct", function (req, res) {
+  
+  con.query(
+    "Insert into products (name,price,description,category,instock,image,shopname) values ('" +
+      req.body.name +
+      "','" +
+      req.body.price +
+      "','" +
+      req.body.description +
+      "','" +
+      req.body.category +
+      "','" +
+      req.body.instock +
+      "','" +
+      req.body.image +
+      "','" +
+      req.body.shopname +
+      "')",
+    function (err, result) {
+      if (err) {
+        if (err.code === "ER_DUP_ENTRY") {
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Product with same name exists");
+        }
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "text/plain",
+      });
+      res.end("Product Added");
+    }
+  );
+});
+
+app.post("/updateproduct", function (req, res) {
+  
+  con.query(
+    "Update products set price='" +
+      req.body.price +
+      "',description='" +
+      req.body.description +
+      "',category='" +
+      req.body.category +
+      "',instock='" +
+      req.body.instock +
+      "',image='" +
+      req.body.image +
+      "' where name='" +
+      req.body.name +
+      "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "text/plain",
+      });
+      res.end("Product Updated");
+    }
+  );
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/api/products", function (req, res) {
+  
+  con.query("Select * from products", function (err, result) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify(result));
+  });
+});
+
+app.get("/api/products/id/:id", function (req, res) {
+  
+  const id = req.params.id;
+  con.query("Select * from products", function (err, result) {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    const product = result.find((x) => x.id === parseInt(id));
+    res.writeHead(200, {
+      "Content-Type": "application/json",
+    });
+    res.end(JSON.stringify(product));
+  });
+});
+
+app.get("/ownerdetails/:shopname", function (req, res) {
+  
+  const shopname = req.params.shopname;
+  con.query(
+    "Select * from users where shopname ='" + shopname + "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+      });
+      res.end(JSON.stringify(result[0]));
+    }
+  );
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/products/:shopname", function (req, res) {
+  
+  const shopname = req.params.shopname;
+  con.query(
+    "Select * from products where shopname='" + shopname + "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+      });
+      res.end(JSON.stringify(result));
+    }
+  );
+});
+
+//Route to handle Post Request Call
+app.post("/addshopimage", function (req, res) {
+  
+  con.query(
+    "UPDATE shop SET shopimage='" + req.body.shopImage + "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "text/plain",
+      });
+      res.end("Shop Image added");
+    }
+  );
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/shopimage/:shopname", function (req, res) {
+  const shopname = req.params.shopname;
+  con.query(
+    "Select shopimage from shop where shopname='" + shopname + "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+      });
+      res.end(JSON.stringify(result[0]));
+    }
+  );
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/productdetails/:name", function (req, res) {
+  const productname = req.params.name;
+  con.query(
+    "Select * from products where name='" + productname + "'",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+      });
+      res.end(JSON.stringify(result[0]));
+    }
+  );
+});
+
+app.post("/createorder", function (req, res) {
+  
+  con.query(
+    "Insert into orders (image,name,shopname,quantity,price,dateofpurchase,customeremail,currency) values ('" +
+      req.body.image +
+      "','" +
+      req.body.name +
+      "','" +
+      req.body.shopname +
+      "'," +
+      req.body.quantity +
+      "," +
+      req.body.price +
+      ",'" +
+      req.body.date +
+      "','" +
+      req.body.email +
+      "','" +
+      req.body.currency +
+      "')",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      con.query(
+        "UPDATE products SET instock= instock-" +
+          req.body.quantity +
+          ",totalsales= totalsales+" +
+          req.body.quantity +
+          " where shopname='" +
+          req.body.shopname +
+          "' and name='" +
+          req.body.name +
+          "'",
+        function (err, result) {
+          if (err) {
+            console.log(err);
+            return;
+          }
+          res.writeHead(200, {
+            "Content-Type": "text/plain",
+          });
+          res.end("Order Creted");
+        }
+      );
+    }
+  );
+});
+
+//Route to get All Products when user visits the Home Page
+app.get("/orders/:email", function (req, res) {
+  
+  const email = req.params.email;
+  con.query(
+    "Select * from orders where customeremail='" +
+      email +
+      "' order by dateofpurchase asc",
+    function (err, result) {
+      if (err) {
+        console.log(err);
+        return;
+      }
+      res.writeHead(200, {
+        "Content-Type": "application/json",
+      });
+      res.end(JSON.stringify(result));
     }
   );
 });
 
 app.get("/search", function (req, res) {
+  
   if (req.query.email === "") {
     con.query(
       "Select * from products where name like '%" +
@@ -275,334 +624,7 @@ app.get("/search", function (req, res) {
   }
 });
 
-app.post("/addproduct", function (req, res) {
-  con.query(
-    "Insert into products (name,price,description,category,instock,image,shopname) values ('" +
-      req.body.name +
-      "','" +
-      req.body.price +
-      "','" +
-      req.body.description +
-      "','" +
-      req.body.category +
-      "','" +
-      req.body.instock +
-      "','" +
-      req.body.image +
-      "','" +
-      req.body.shopname +
-      "')",
-    function (err, result) {
-      if (err) {
-        if (err.code === "ER_DUP_ENTRY") {
-          res.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          res.end("Product exists with same name");
-        }
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Added the product successfully");
-    }
-  );
-});
-
-app.post("/updateproduct", function (req, res) {
-  con.query(
-    "Update products set price='" +
-      req.body.price +
-      "',description='" +
-      req.body.description +
-      "',category='" +
-      req.body.category +
-      "',instock='" +
-      req.body.instock +
-      "',image='" +
-      req.body.image +
-      "' where name='" +
-      req.body.name +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Updated product information successfully");
-    }
-  );
-});
-
 //Route to get All Products when user visits the Home Page
-app.get("/api/products", function (req, res) {
-  con.query("Select * from products", function (err, result) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify(result));
-  });
-});
-
-app.get("/api/products/id/:id", function (req, res) {
-  const id = req.params.id;
-  con.query("Select * from products", function (err, result) {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    const product = result.find((x) => x.id === parseInt(id));
-    res.writeHead(200, {
-      "Content-Type": "application/json",
-    });
-    res.end(JSON.stringify(product));
-  });
-});
-
-app.post("/checkavailability", function (req, res) {
-  con.query(
-    "Select * from shop where shopname='" + req.body.shopname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      // req.session.user = result;
-
-      console.log(result);
-      if (result < 1) {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Shop is available.");
-      } else {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Shop is not available.");
-      }
-    }
-  );
-});
-
-app.post("/shopcreated", function (req, res) {
-  con.query(
-    "Select shopname from users where email='" + req.body.email + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      if (result[0].shopname == null) {
-        res.writeHead(400, {
-          "Content-Type": "text/plain",
-        });
-        res.end("Shop could not be created");
-      } else {
-        res.writeHead(200, {
-          "Content-Type": "text/plain",
-        });
-        res.end(result[0].shopname);
-      }
-    }
-  );
-});
-
-app.post("/createshop", function (req, res) {
-  con.query(
-    "Insert into shop (shopname,email) values ('" +
-      req.body.shopname +
-      "','" +
-      req.body.email +
-      "')",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-    }
-  );
-  con.query(
-    "Update users SET shopname='" +
-      req.body.shopname +
-      "' where email='" +
-      req.body.email +
-      "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Shop was created successfully");
-    }
-  );
-});
-
-app.get("/ownerdetails/:shopname", function (req, res) {
-  const shopname = req.params.shopname;
-  con.query(
-    "Select * from users where shopname ='" + shopname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result[0]));
-    }
-  );
-});
-
-app.get("/products/:shopname", function (req, res) {
-  const shopname = req.params.shopname;
-  con.query(
-    "Select * from products where shopname='" + shopname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result));
-    }
-  );
-});
-
-app.post("/addshopimage", function (req, res) {
-  con.query(
-    "UPDATE shop SET shopimage='" + req.body.shopImage + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "text/plain",
-      });
-      res.end("Added the shop image successfully");
-    }
-  );
-});
-
-app.get("/shopimage/:shopname", function (req, res) {
-  const shopname = req.params.shopname;
-  con.query(
-    "Select shopimage from shop where shopname='" + shopname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result[0]));
-    }
-  );
-});
-
-app.get("/productdetails/:name", function (req, res) {
-  const productname = req.params.name;
-  con.query(
-    "Select * from products where name='" + productname + "'",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result[0]));
-    }
-  );
-});
-
-app.post("/createorder", function (req, res) {
-  con.query(
-    "Insert into orders (image,name,shopname,quantity,price,dateofpurchase,customeremail,currency) values ('" +
-      req.body.image +
-      "','" +
-      req.body.name +
-      "','" +
-      req.body.shopname +
-      "'," +
-      req.body.quantity +
-      "," +
-      req.body.price +
-      ",'" +
-      req.body.date +
-      "','" +
-      req.body.email +
-      "','" +
-      req.body.currency +
-      "')",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      con.query(
-        "UPDATE products SET instock= instock-" +
-          req.body.quantity +
-          ",totalsales= totalsales+" +
-          req.body.quantity +
-          " where shopname='" +
-          req.body.shopname +
-          "' and name='" +
-          req.body.name +
-          "'",
-        function (err, result) {
-          if (err) {
-            console.log(err);
-            return;
-          }
-          res.writeHead(200, {
-            "Content-Type": "text/plain",
-          });
-          res.end("Created the order successfully");
-        }
-      );
-    }
-  );
-});
-
-app.get("/orders/:email", function (req, res) {
-  const email = req.params.email;
-  con.query(
-    "Select * from orders where customeremail='" +
-      email +
-      "' order by dateofpurchase asc",
-    function (err, result) {
-      if (err) {
-        console.log(err);
-        return;
-      }
-      res.writeHead(200, {
-        "Content-Type": "application/json",
-      });
-      res.end(JSON.stringify(result));
-    }
-  );
-});
-
 app.get("/shopsalestotal/:shopname", function (req, res) {
   const shopname = req.params.shopname;
   con.query(
@@ -622,9 +644,9 @@ app.get("/shopsalestotal/:shopname", function (req, res) {
   );
 });
 
-//Route to get all the categories
+//Route to get All Products when user visits the Home Page
 app.get("/categories", function (req, res) {
-  con.query("Select * from categories", function (err, result) {
+  con.query("Select name from categories", function (err, result) {
     if (err) {
       console.log(err);
       return;
@@ -632,10 +654,12 @@ app.get("/categories", function (req, res) {
     res.writeHead(200, {
       "Content-Type": "application/json",
     });
+    // console.log(result);
     res.end(JSON.stringify(result));
   });
 });
 
+//Route to get other Products when user visits the Home Page
 app.get("/othersellerproducts/:email", function (req, res) {
   const email = req.params.email;
   con.query(
@@ -671,7 +695,6 @@ app.get("/othersellerproducts/:email", function (req, res) {
   );
 });
 
-//Route to add favorite products
 app.post("/addtofavorites", function (req, res) {
   con.query(
     "Select * from favorites where name='" +
@@ -704,7 +727,7 @@ app.post("/addtofavorites", function (req, res) {
             res.writeHead(200, {
               "Content-Type": "text/plain",
             });
-            res.end("Product added to favorites list");
+            res.end("Added to favorites");
           }
         );
       } else {
@@ -718,7 +741,7 @@ app.post("/addtofavorites", function (req, res) {
             res.writeHead(400, {
               "Content-Type": "text/plain",
             });
-            res.end("Product removed from favorites");
+            res.end("Removed from favorites");
           }
         );
       }
@@ -726,8 +749,9 @@ app.post("/addtofavorites", function (req, res) {
   );
 });
 
-//Route to Get users favorites
-app.get("/getfavorite/:email", function (req, res) {
+//Route to get All Products when user visits the Home Page
+app.get("/getfavoriteproducts/:email", function (req, res) {
+
   con.query(
     "SELECT GROUP_CONCAT(QUOTE(name)) as name FROM favorites where email='" +
       req.params.email +
@@ -760,3 +784,5 @@ app.get("/getfavorite/:email", function (req, res) {
 //start your server on port 3001
 app.listen(3001);
 console.log("Server Listening on port 3001");
+
+module.exports = app;

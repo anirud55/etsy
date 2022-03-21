@@ -9,6 +9,9 @@ import {
   } from "@material-ui/icons";
   import styled from "styled-components";
   import { mobile } from "../responsive";
+  import Dropdown from "react-bootstrap/Dropdown";
+  import { useDispatch } from "react-redux";
+  import { currencychange } from "../actions/currencyAction";
   
   const Container = styled.div`
     display: flex;
@@ -85,6 +88,12 @@ import {
   `;
   
   const Footer = () => {
+
+    const currencyupdate = (e) => {
+    console.log(e);
+    dispatch(currencychange(e));
+  };
+  const dispatch = useDispatch();
     return (
       <Container>
         <Left>
@@ -123,6 +132,22 @@ import {
             <ListItem>Wishlist</ListItem>
             <ListItem>Terms</ListItem>
           </List>
+          <Dropdown
+              style={{ position: "absolute", left: "300px", bottom: "25px" }}
+              onSelect={currencyupdate}
+            >
+              {" "}
+              <Dropdown.Toggle id="dropdown-basic" style={{ "background-color": "teal" }}>
+                Currency
+              </Dropdown.Toggle>
+              <Dropdown.Menu>
+                <Dropdown.Item eventKey="$">USD($)</Dropdown.Item>
+                <Dropdown.Item eventKey="₹">INR(₹)</Dropdown.Item>
+                <Dropdown.Item eventKey="">JPY(¥)</Dropdown.Item>
+                <Dropdown.Item eventKey="€">EUR(€)</Dropdown.Item>
+                <Dropdown.Item eventKey="£">GBP(£)</Dropdown.Item>
+              </Dropdown.Menu>
+            </Dropdown>
         </Center>
         <Right>
           <Title>Contact</Title>

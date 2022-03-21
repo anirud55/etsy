@@ -1,16 +1,16 @@
 import { createStore, compose, applyMiddleware, combineReducers } from "redux";
 import thunk from "redux-thunk";
-import { currencyredux } from "./redux/currencyredux";
-import { favoritesupdatedredux } from "./redux/favoritesredux";
+import { currencyReducer } from "./reducers/currencyreducer";
+import { favoritesupdatedreducer } from "./reducers/favoritesreducer";
 import {
-  productredux,
-  shopPageProductsUpdatedredux,
-} from "./redux/productredux";
+  productreducer,
+  shopPageProductsUpdatedreducer,
+} from "./reducers/productreducer";
 import {
-  loginstatusRedux,
+  loginstatusReducer,
   usererror,
-  userSigninRedux,
-} from "./redux/userRedux";
+  userSigninReducer,
+} from "./reducers/userReducers";
 
 const initialState = {
   userInfo: null,
@@ -22,13 +22,13 @@ const initialState = {
   favoritesupdated: false,
 };
 const reducer = combineReducers({
-  userInfo: userSigninRedux,
+  userInfo: userSigninReducer,
   error: usererror,
-  currency: currencyredux,
-  isLoggedIn: loginstatusRedux,
-  products: productredux,
-  shopPageProductsUpdated: shopPageProductsUpdatedredux,
-  favoritesupdated: favoritesupdatedredux,
+  currency: currencyReducer,
+  isLoggedIn: loginstatusReducer,
+  products: productreducer,
+  shopPageProductsUpdated: shopPageProductsUpdatedreducer,
+  favoritesupdated: favoritesupdatedreducer,
 });
 
 const composeEnhancer = window.__REDUX_DEVTOOLS_EXTENSION_COMPOSE__ || compose;

@@ -9,6 +9,7 @@ import Select from "react-select";
 import { useDispatch } from "react-redux";
 import { shopPageProductsUpdated } from "../actions/productactions";
 import { useNavigate } from "react-router";
+import { BACKEND } from "../constants/userConstants";
 
 export default function EditModal(props) {
   const { shopname } = props;
@@ -21,7 +22,7 @@ export default function EditModal(props) {
     setCategory("");
     setDescription("");
     setCountInStock("");
-    navigate("/shoppage/" + shopname);
+    navigate("/shop/" + shopname);
     setShow(false);
   };
   const handleShow = () => setShow(true);
@@ -37,10 +38,11 @@ export default function EditModal(props) {
   const [mounted, setMounted] = useState(false);
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  
 
   useEffect(() => {
     dispatch(shopPageProductsUpdated(false));
-    axios.get("http://localhost:3001/products/" + shopname).then((response) => {
+    axios.get(BACKEND + "/products/" + shopname).then((response) => {
       //update the state with the response data
       const abc = [];
       response.data.map((product) =>
@@ -49,9 +51,15 @@ export default function EditModal(props) {
       setOptions(abc);
       setMounted(true);
     });
-    axios.get("http://localhost:3001/categories").then((response) => {
-      //update the state with the response data
-      setcategoryOptions(response.data);
+    axios.get(BACKEND + "/categories").then((response) => {
+      // update the state with the response data
+      const category = [];
+      // setcategoryOptions(response.data);
+      response.data.map((categories) =>
+        category.push({ value: categories.id, label: categories.name })
+      );
+      setcategoryOptions(category);
+      setMounted(true);
     });
   }, []);
 
@@ -60,7 +68,7 @@ export default function EditModal(props) {
     setMessage("");
     setName(e.label);
     axios
-      .get("http://localhost:3001/productdetails/" + e.label)
+      .get(BACKEND + "/productdetails/" + e.label)
       .then((response) => {
         //update the state with the response data
         setImage(response.data.image);
@@ -124,7 +132,7 @@ export default function EditModal(props) {
     //set the with credentials to true
     axios.defaults.withCredentials = true;
     //make a post request with the user data
-    axios.post("http://localhost:3001/updateproduct", data).then((response) => {
+    axios.post(BACKEND + "/updateproduct", data).then((response) => {
       console.log("Status Code : ", response.status);
       if (response.status === 200 && response.data === "Product Updated") {
         setMessage("Product has been updated");
@@ -137,7 +145,13 @@ export default function EditModal(props) {
 
   return !props.products ? null : (
     <>
-      <Button variant="primary" onClick={handleShow}>
+      <Button variant="primary" onClick={handleShow} style={{
+                        width: "100%", border: "none",
+                        "padding": "15px 20px", "background-color": "teal",
+                        "color": "white",
+                        "cursor": "pointer",
+                        "margin-bottom": "10px"
+                      }}>
         Edit Product
       </Button>
 
@@ -171,7 +185,7 @@ export default function EditModal(props) {
             <Select
               value={name}
               options={option}
-              placeholder={name}
+              placeholder="Name of the Product"
               onChange={nameChangeHandler}
             ></Select>
           </div>
@@ -204,6 +218,7 @@ export default function EditModal(props) {
               options={categoryoptions}
               placeholder={category}
               onChange={categoryChangeHandler}
+              placeholder="Product Category"
             ></Select>
           </div>
           <br></br>
@@ -220,15 +235,27 @@ export default function EditModal(props) {
           <br></br>
         </Modal.Body>
         <Modal.Footer>
-          <Button variant="secondary" onClick={handleClose}>
+          <Button variant="secondary" onClick={handleClose} style={{
+                        width: "100%", border: "none",
+                        "padding": "15px 20px", "background-color": "teal",
+                        "color": "white",
+                        "cursor": "pointer",
+                        "margin-bottom": "10px"
+                      }}>
             Close
           </Button>
-          <Button variant="primary" onClick={updateProduct}>
+          <Button variant="primary" onClick={updateProduct} style={{
+                        width: "100%", border: "none",
+                        "padding": "15px 20px", "background-color": "teal",
+                        "color": "white",
+                        "cursor": "pointer",
+                        "margin-bottom": "10px"
+                      }}>
             Update Product
           </Button>
         </Modal.Footer>
         <div class={message ? "visible" : "invisible"}>
-          <div class="alert alert-primary">{message}</div>
+          <div >{message}</div>
         </div>
       </Modal>
     </>

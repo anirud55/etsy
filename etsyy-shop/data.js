@@ -6,7 +6,7 @@ const data = {
       category: "Decor",
       image: "/images/p1.jpg",
       price: 120,
-      countInStock: 10,
+      countInStock: 0,
       brand: "rldh",
       rating: 4.5,
       numReviews: 10,
@@ -52,28 +52,3 @@ const data = {
 };
 
 export default data;
-
-
-export const sliderItems = [
-  {
-    id: 1,
-    img: "https://images.pexels.com/photos/7137417/pexels-photo-7137417.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-    title: "SUMMER SALE",
-    desc: "DON'T COMPROMISE ON STYLE! GET FLAT 30% OFF FOR NEW ARRIVALS.",
-    bg: "f5fafd",
-  },
-  {
-    id: 2,
-    img: "https://images.pexels.com/photos/9532670/pexels-photo-9532670.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-    title: "AUTUMN COLLECTION",
-    desc: "DON'T COMPROMISE ON STYLE! GET FLAT 30% OFF FOR NEW ARRIVALS.",
-    bg: "fcf1ed",
-  },
-  {
-    id: 3,
-    img: "https://images.pexels.com/photos/1043474/pexels-photo-1043474.jpeg?auto=compress&cs=tinysrgb&dpr=2&h=750&w=1260",
-    title: "SPRING COLLECTION",
-    desc: "DON'T COMPROMISE ON STYLE! GET FLAT 30% OFF FOR NEW ARRIVALS.",
-    bg: "fbf0f4",
-  },
-];

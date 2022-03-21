@@ -9,6 +9,7 @@ import Select from "react-select";
 import { useDispatch } from "react-redux";
 import { shopPageProductsUpdated } from "../actions/productactions";
 import { useNavigate } from "react-router";
+import { BACKEND } from "../constants/userConstants";
 
 export default function CreateModal(props) {
   const { shopname } = props;
@@ -21,7 +22,7 @@ export default function CreateModal(props) {
     setDescription("");
     setCountInStock("");
     setMessage("");
-    navigate("/shoppage/" + shopname);
+    navigate("/shop/" + shopname);
     setShow(false);
   };
   const handleShow = () => setShow(true);
@@ -32,7 +33,9 @@ export default function CreateModal(props) {
   const [price, setPrice] = useState("");
   const [countInStock, setCountInStock] = useState("");
   const [options, setOptions] = useState("");
+  const [categoryoptions, setcategoryOptions] = useState("");
   const [message, setMessage] = useState("");
+  const [mounted, setMounted] = useState(false);
   const navigate = useNavigate();
   const dispatch = useDispatch();
 
@@ -43,7 +46,7 @@ export default function CreateModal(props) {
   };
   //category change handler to update state variable with the text entered by the user
   const categoryChangeHandler = (e) => {
-    setCategory(e.label);
+    setCategory(e.target.value);
     setMessage("");
   };
   //price change handler to update state variable with the text entered by the user
@@ -81,9 +84,20 @@ export default function CreateModal(props) {
 
   useEffect(() => {
     dispatch(shopPageProductsUpdated(false));
-    axios.get("http://localhost:3001/categories").then((response) => {
+    axios.get(BACKEND + "/categories").then((response) => {
       //update the state with the response data
+      console.log(response.data);
       setOptions(response.data);
+    });
+    axios.get(BACKEND + "/categories").then((response) => {
+      // update the state with the response data
+      const category = [];
+      // setcategoryOptions(response.data);
+      response.data.map((categories) =>
+        category.push({ value: categories.id, label: categories.name })
+      );
+      setcategoryOptions(category);
+      setMounted(true);
     });
   }, []);
 
@@ -103,7 +117,7 @@ export default function CreateModal(props) {
     axios.defaults.withCredentials = true;
     //make a post request with the user data
     axios
-      .post("http://localhost:3001/addproduct", data)
+      .post(BACKEND + "/addproduct", data)
       .then((response) => {
         console.log("Status Code : ", response.status);
         if (response.status === 200 && response.data === "Product Added") {
@@ -123,7 +137,13 @@ export default function CreateModal(props) {
 
   return (
     <>
-      <Button variant="primary" onClick={handleShow}>
+      <Button variant="primary" onClick={handleShow} style={{
+                        width: "100%", border: "none",
+                        "padding": "15px 20px", "background-color": "teal",
+                        "color": "white",
+                        "cursor": "pointer",
+                        "margin-bottom": "10px"
+                      }}>
         Add Product
       </Button>
 
@@ -189,8 +209,8 @@ export default function CreateModal(props) {
           <div class="form-group" style={{ width: "100%" }}>
             <Select
               value={category}
-              options={options}
-              placeholder={category}
+              options={categoryoptions}
+              placeholder="Select Category"
               onChange={categoryChangeHandler}
             ></Select>
           </div>
@@ -209,17 +229,29 @@ export default function CreateModal(props) {
         </Modal.Body>
         <Modal.Footer>
           <div>
-            <Button variant="secondary" onClick={handleClose}>
-              Close
-            </Button>
-            <Button variant="primary" onClick={addProduct}>
+          <Button variant="primary" onClick={addProduct} style={{
+                        width: "100%", border: "none",
+                        "padding": "15px 20px", "background-color": "teal",
+                        "color": "white",
+                        "cursor": "pointer",
+                        "margin-bottom": "10px"
+                      }}>
               Add Product
+            </Button>
+            <Button variant="secondary" onClick={handleClose} style={{
+                        width: "100%", border: "none",
+                        "padding": "15px 20px", "background-color": "teal",
+                        "color": "white",
+                        "cursor": "pointer",
+                        "margin-bottom": "10px"
+                      }}>
+              Close
             </Button>
           </div>
           <br></br>
         </Modal.Footer>
         <div class={message ? "visible" : "invisible"}>
-          <div class="alert alert-primary">{message}</div>
+          <div>{message}</div>
         </div>
       </Modal>
     </>
