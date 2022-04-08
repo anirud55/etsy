@@ -12,4 +12,4 @@ export const SET_PRODUCTS = "SET_PRODUCTS";
 export const UPDATE_USER_INFO = "UPDATE_USER_INFO";
 export const SHOP_PAGE_PRODUCTS_UPDATED = "SHOP_PAGE_PRODUCTS_UPDATED";
 export const FAVORITES_UPDATED = "FAVORITES_UPDATED";
-export const BACKEND = "/"
+export const BACKEND = "http://localhost:3001"
